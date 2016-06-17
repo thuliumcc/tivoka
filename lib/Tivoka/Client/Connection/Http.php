@@ -30,6 +30,7 @@
  */
 
 namespace Tivoka\Client\Connection;
+
 use Tivoka\Client\BatchRequest;
 use Tivoka\Exception;
 use Tivoka\Client\Request;
@@ -38,7 +39,8 @@ use Tivoka\Client\Request;
  * HTTP connection
  * @package Tivoka
  */
-class Http extends AbstractConnection {
+class Http extends AbstractConnection
+{
 
     public $target;
     public $headers = array();
@@ -52,7 +54,8 @@ class Http extends AbstractConnection {
      *
      * @throws Exception\Exception
      */
-    public function __construct($target) {
+    public function __construct($target)
+    {
         //validate url...
         if (!filter_var($target, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
             throw new Exception\Exception('Valid URL (scheme://domain[/path][/file]) required.');
@@ -77,10 +80,11 @@ class Http extends AbstractConnection {
         }
     }
 
-    public function __destruct() {
-      if(!is_null($this->ch)) {
-        curl_close($this->ch);
-      }
+    public function __destruct()
+    {
+        if (!is_null($this->ch)) {
+            curl_close($this->ch);
+        }
     }
 
     /**
@@ -89,37 +93,39 @@ class Http extends AbstractConnection {
      * @param string $value value of header
      * @return Http Self instance
      */
-    public function setHeader($label, $value) {
+    public function setHeader($label, $value)
+    {
         $this->headers[$label] = $value;
         return $this;
     }
 
     /**
      * Sends a JSON-RPC request
-     * 
+     *
      * @param Request $request A Tivoka request
      *
      * @return Request if sent as a batch request the BatchRequest object will be returned
      * @throws Exception\Exception
      */
-    public function send(Request $request) {
-        if(func_num_args() > 1 ) $request = func_get_args();
-        if(is_array($request)) {
+    public function send(Request $request)
+    {
+        if (func_num_args() > 1) $request = func_get_args();
+        if (is_array($request)) {
             $request = new BatchRequest($request);
         }
-        
-        if(!($request instanceof Request)) throw new Exception\Exception('Invalid data type to be sent to server');
-        
+
+        if (!($request instanceof Request)) throw new Exception\Exception('Invalid data type to be sent to server');
+
         if (!is_null($this->ch)) {
             $headers = array(
                 'Content-Type: application/json',
                 'Connection: Close'
             );
-            foreach($this->headers as $label => $value) {
+            foreach ($this->headers as $label => $value) {
                 $headers[] = $label . ": " . $value;
             }
             $response_headers = array();
-            $headerFunction = function($ch, $header) use (&$response_headers) {
+            $headerFunction = function ($ch, $header) use (&$response_headers) {
                 $header2 = rtrim($header, "\r\n");
                 if ($header2 != '') {
                     $response_headers[] = $header2;
@@ -137,19 +143,19 @@ class Http extends AbstractConnection {
         } elseif (ini_get('allow_url_fopen')) {
             // preparing connection...
             $context = array(
-                    'http' => array(
-                        'content' => $request->getRequest($this->spec),
-                        'header' => "Content-Type: application/json\r\n".
-                                    "Connection: Close\r\n",
-                        'method' => 'POST',
-                        'timeout' => $this->timeout
-                    )
+                'http' => array(
+                    'content' => $request->getRequest($this->spec),
+                    'header' => "Content-Type: application/json\r\n" .
+                        "Connection: Close\r\n",
+                    'method' => 'POST',
+                    'timeout' => $this->timeout
+                )
             );
             if (isset($this->options['ssl_verify_peer'])) {
                 $context['ssl']['verify_peer'] = $this->options['ssl_verify_peer'];
             }
-            foreach($this->headers as $label => $value) {
-            $context['http']['header'] .= $label . ": " . $value . "\r\n";
+            foreach ($this->headers as $label => $value) {
+                $context['http']['header'] .= $label . ": " . $value . "\r\n";
             }
             //sending...
             $response = @file_get_contents($this->target, false, stream_context_create($context));
@@ -157,8 +163,8 @@ class Http extends AbstractConnection {
         } else {
             throw new Exception\ConnectionException('Install cURL extension or enable allow_url_fopen');
         }
-        if($response === FALSE) {
-            throw new Exception\ConnectionException('Connection to "'.$this->target.'" failed');
+        if ($response === FALSE) {
+            throw new Exception\ConnectionException('Connection to "' . $this->target . '" failed');
         }
         $request->setResponse($response);
         $request->setHeaders($response_headers);
