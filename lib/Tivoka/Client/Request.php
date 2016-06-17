@@ -82,7 +82,7 @@ class Request
     public function getRequest($spec)
     {
         $this->spec = $spec;
-        return $this->request = $this->serializer->serialize(self::prepareRequest($spec, $this->id, $this->method, $this->params));
+        return $this->serializer->serialize(self::prepareRequest($spec, $this->id, $this->method, $this->params));
     }
 
     /**
