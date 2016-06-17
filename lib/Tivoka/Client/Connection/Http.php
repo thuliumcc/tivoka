@@ -46,6 +46,10 @@ class Http extends AbstractConnection
     public $headers = array();
 
     private $ch;
+    private $defaultHeaders = array(
+        "Content-Type" => "application/json",
+        "Connection" => "Close"
+    );
 
     /**
      * Constructs connection
@@ -99,6 +103,11 @@ class Http extends AbstractConnection
         return $this;
     }
 
+    public function getHeaders()
+    {
+        return array_merge($this->defaultHeaders, $this->headers);
+    }
+
     /**
      * Sends a JSON-RPC request
      *
@@ -117,11 +126,8 @@ class Http extends AbstractConnection
         if (!($request instanceof Request)) throw new Exception\Exception('Invalid data type to be sent to server');
 
         if (!is_null($this->ch)) {
-            $headers = array(
-                'Content-Type: application/json',
-                'Connection: Close'
-            );
-            foreach ($this->headers as $label => $value) {
+            $headers = array();
+            foreach ($this->getHeaders() as $label => $value) {
                 $headers[] = $label . ": " . $value;
             }
             $response_headers = array();
@@ -145,8 +151,7 @@ class Http extends AbstractConnection
             $context = array(
                 'http' => array(
                     'content' => $request->getRequest($this->spec),
-                    'header' => "Content-Type: application/json\r\n" .
-                        "Connection: Close\r\n",
+                    'header' => "",
                     'method' => 'POST',
                     'timeout' => $this->timeout
                 )
@@ -154,7 +159,7 @@ class Http extends AbstractConnection
             if (isset($this->options['ssl_verify_peer'])) {
                 $context['ssl']['verify_peer'] = $this->options['ssl_verify_peer'];
             }
-            foreach ($this->headers as $label => $value) {
+            foreach ($this->getHeaders() as $label => $value) {
                 $context['http']['header'] .= $label . ": " . $value . "\r\n";
             }
             //sending...
