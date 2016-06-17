@@ -31,6 +31,7 @@
  */
 
 namespace Tivoka\Client;
+
 use Tivoka\Client\Connection\AbstractConnection;
 use Tivoka\Exception;
 use Tivoka\Tivoka;
@@ -41,23 +42,24 @@ use Tivoka\Tivoka;
  */
 class Request
 {
-    public $id;
-    public $method;
-    public $params;
-    public $request;
-    public $response;
+    protected $id;
+    protected $method;
+    protected $params;
+    protected $request;
+    protected $response;
 
-    public $result;
-    public $error;
-    public $errorMessage;
-    public $errorData;
+    protected $result;
+    protected $error;
+    protected $errorMessage;
+    protected $errorData;
 
-    public $responseHeaders;
-    public $responseHeadersRaw;
+    protected $responseHeaders;
+    protected $responseHeadersRaw;
     /**
      * @var RequestSerializer
      */
     protected $serializer;
+    protected $spec;
 
     /**
      * Constructs a new JSON-RPC request object
@@ -103,7 +105,7 @@ class Request
         // rfc2616: The first line of a Response message is the Status-Line
         $headers = array_slice($headers, 1); // removing status-line
 
-        $header_array = array();
+        $headers_array = array();
         foreach ($headers as $header) {
             preg_match('/(?P<label>[^ :]+):(?P<body>(.|\r?\n(?= +))*)$/', $header, $matches);
             $headers_array[$matches["label"]] = trim($matches["body"]);
@@ -124,18 +126,16 @@ class Request
     {
         $this->response = $response;
 
-        //no response?
         if (trim($response) == '') {
             throw new Exception\ConnectionException('No response received');
         }
 
-        //decode
-        $resparr = json_decode($response, true);
-        if ($resparr == NULL) {
+        $responseArray = json_decode($response, true);
+        if ($responseArray == NULL) {
             throw new Exception\SyntaxException('Invalid response encoding');
         }
 
-        $this->interpretResponse($resparr);
+        $this->interpretResponse($responseArray);
     }
 
     /**
@@ -209,6 +209,8 @@ class Request
                     'id' => $assoc['id'],
                     'result' => $assoc['result']
                 );
+            default:
+                throw new Exception\SpecException("Invalid specification.");
         }
     }
 
@@ -237,6 +239,8 @@ class Request
                     'id' => $assoc['id'],
                     'error' => array('data' => $assoc['error'])
                 );
+            default:
+                throw new Exception\SpecException("Invalid specification.");
         }
     }
 
@@ -271,6 +275,8 @@ class Request
                     $request['params'] = $params;
                 }
                 return $request;
+            default:
+                throw new Exception\SpecException("Invalid specification.");
         }
     }
 
@@ -288,5 +294,3 @@ class Request
         );
     }
 }
-
-?>
