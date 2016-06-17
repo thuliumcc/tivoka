@@ -29,6 +29,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $requestJson = $request->getRequest(Tivoka::SPEC_2_0);
 
         //then
-        $this->assertEquals('{"jsonrpc":"2.0","method":"test","id":"1","serializer":"CustomJsonSerializer"}', $requestJson);
+        $this->assertEquals('{"jsonrpc":"2.0","method":"test","id":"1xxx1","serializer":"CustomJsonSerializer"}', $requestJson);
     }
 }
