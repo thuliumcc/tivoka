@@ -25,6 +25,7 @@
  *
  * @package  Tivoka
  * @author Marcel Klehr <mklehr@gmx.net>
+ * @author Andrzej Oczkowicz <andrzej.oczkowicz@thulium.pl>
  * @copyright (c) 2011-2012, Marcel Klehr
  */
 
