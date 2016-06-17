@@ -54,6 +54,10 @@ class Request
 
     public $responseHeaders;
     public $responseHeadersRaw;
+    /**
+     * @var RequestSerializer
+     */
+    protected $serializer;
 
     /**
      * Constructs a new JSON-RPC request object
@@ -61,11 +65,12 @@ class Request
      * @param mixed $params Additional params for the remote procedure (optional)
      * @see Tivoka_Connection::send()
      */
-    public function __construct($method, $params = null)
+    public function __construct($method, $params = null, $serializer = null)
     {
         $this->id = self::uuid();
         $this->method = $method;
         $this->params = $params;
+        $this->serializer = $serializer ?: new RequestJsonSerializerWithParams();
     }
 
     /**
@@ -75,7 +80,7 @@ class Request
     public function getRequest($spec)
     {
         $this->spec = $spec;
-        return $this->request = json_encode(self::prepareRequest($spec, $this->id, $this->method, $this->params));
+        return $this->request = $this->serializer->serialize(self::prepareRequest($spec, $this->id, $this->method, $this->params));
     }
 
     /**
