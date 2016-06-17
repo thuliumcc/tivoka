@@ -42,24 +42,24 @@ use Tivoka\Tivoka;
  */
 class Request
 {
-    protected $id;
-    protected $method;
-    protected $params;
-    protected $request;
-    protected $response;
+    public $id;
+    public $method;
+    public $params;
+    public $request;
+    public $response;
 
-    protected $result;
-    protected $error;
-    protected $errorMessage;
-    protected $errorData;
+    public $result;
+    public $error;
+    public $errorMessage;
+    public $errorData;
 
-    protected $responseHeaders;
-    protected $responseHeadersRaw;
+    public $responseHeaders;
+    public $responseHeadersRaw;
     /**
      * @var RequestSerializer
      */
-    protected $serializer;
-    protected $spec;
+    public $serializer;
+    public $spec;
 
     /**
      * Constructs a new JSON-RPC request object
@@ -83,7 +83,7 @@ class Request
     public function getRequest($spec)
     {
         $this->spec = $spec;
-        return $this->serializer->serialize(self::prepareRequest($spec, $this->id, $this->method, $this->params));
+        return $this->request = $this->serializer->serialize(self::prepareRequest($spec, $this->id, $this->method, $this->params));
     }
 
     /**
