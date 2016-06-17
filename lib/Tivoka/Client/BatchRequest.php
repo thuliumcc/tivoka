@@ -47,11 +47,13 @@ class BatchRequest extends Request
      * Constructs a new JSON-RPC batch request
      * All values of type other than Tivoka\Client\Request will be ignored
      * @param array $batch A list of requests to include, each a Tivoka_Request
+     * @param RequestSerializer $serializer JSON serializer, default json_encode() with default flags
      * @see Tivoka_Client::send()
      */
-    public function __construct(array $batch)
+    public function __construct(array $batch, $serializer = null)
     {
         $this->id = array();
+        $this->serializer = $serializer ?: new RequestJsonSerializerWithParams();
 
         //prepare requests...
         foreach ($batch as $request) {
@@ -84,7 +86,7 @@ class BatchRequest extends Request
         foreach ($this->requests as $req) {
             $request[] = json_decode($req->getRequest($spec), true);
         }
-        return $this->request = json_encode($request);
+        return $this->request = $this->serializer->serialize($request);
     }
 
     /**

@@ -65,6 +65,7 @@ class Request
      * Constructs a new JSON-RPC request object
      * @param string $method The remote procedure to invoke
      * @param mixed $params Additional params for the remote procedure (optional)
+     * @param RequestSerializer $serializer JSON serializer, default json_encode() with default flags
      * @see Tivoka_Connection::send()
      */
     public function __construct($method, $params = null, $serializer = null)
