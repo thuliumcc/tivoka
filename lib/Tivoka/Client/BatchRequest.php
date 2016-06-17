@@ -30,6 +30,7 @@
 
 
 namespace Tivoka\Client;
+
 use Tivoka\Exception;
 use Tivoka\Tivoka;
 
@@ -39,6 +40,9 @@ use Tivoka\Tivoka;
  */
 class BatchRequest extends Request
 {
+    /** @var Request[] */
+    protected $requests;
+
     /**
      * Constructs a new JSON-RPC batch request
      * All values of type other than Tivoka\Client\Request will be ignored
@@ -147,7 +151,4 @@ class BatchRequest extends Request
         }
     }
 
-
 }
-
-?>
