@@ -180,7 +180,7 @@ class Http extends AbstractConnection
         $request->setResponse($response);
 
         $this->validateHttpResponseCode($headersArray, $request->getValidHttpCodes());
-        
+
         $request->interpret();
         return $request;
     }
@@ -210,7 +210,7 @@ class Http extends AbstractConnection
     {
         if (isset($headersArray['http_status']['http_code'])) {
             $httpCode = $headersArray['http_status']['http_code'];
-            if (in_array($httpCode, $validHttpCodesForRequest)) {
+            if (!in_array($httpCode, $validHttpCodesForRequest)) {
                 $httpStatus = $headersArray['http_status']['status_text'];
                 throw new Exception\ConnectionException("Connection to '{$this->target}' failed. Http code: '$httpCode', status: '$httpStatus'.");
             }
