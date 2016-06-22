@@ -172,15 +172,12 @@ class Http extends AbstractConnection
         if ($response === FALSE) {
             throw new Exception\ConnectionException('Connection to "' . $this->target . '" failed');
         }
+
+        $headersArray = self::http_parse_headers($response_headers);
         $request->setResponse($response);
-        $request->setHeaders($this->parseHeaders($response_headers));
+        $request->setHeaders($headersArray);
         $request->setRawHeaders($response_headers);
         return $request;
-    }
-
-    private function parseHeaders($response_headers)
-    {
-        return $this->http_parse_headers($response_headers);
     }
 
     /**
@@ -188,15 +185,18 @@ class Http extends AbstractConnection
      * @param array $headers array of string coming from $http_response_header
      * @return array associative array linking a header label with its value
      */
-    protected function http_parse_headers($headers)
+    public static function http_parse_headers($headers)
     {
-        // rfc2616: The first line of a Response message is the Status-Line
-        $headers = array_slice($headers, 1); // removing status-line
-
         $headers_array = array();
         foreach ($headers as $header) {
-            preg_match('/(?P<label>[^ :]+):(?P<body>(.|\r?\n(?= +))*)$/', $header, $matches);
-            $headers_array[$matches["label"]] = trim($matches["body"]);
+            if (preg_match('/(?P<label>[^ :]+):(?P<body>(.|\r?\n(?= +))*)$/', $header, $matches)) {
+                $headers_array[$matches["label"]] = trim($matches["body"]);
+            } else {
+                if (preg_match('|HTTP/(?<protocol_version>\d+\.\d+)\s+(?<http_code>\d+)\s*(?<status_text>\w*)|i', $header, $matches)) {
+                    $http_status = array_intersect_key($matches, array_flip(array('protocol_version', 'http_code', 'status_text')));
+                    $headers_array['http_status'] = $http_status;
+                }
+            }
         };
         return $headers_array;
     }
