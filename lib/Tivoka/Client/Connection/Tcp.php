@@ -151,6 +151,7 @@ class Tcp extends AbstractConnection {
         }
 
         $request->setResponse($response);
+        $request->interpret();
         return $request;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Tivoka\Client\Connection;
+
 use Tivoka\Client\BatchRequest;
 use Tivoka\Exception;
 use Tivoka\Client\Request;
@@ -15,7 +16,8 @@ use WebSocket\Client;
  *
  * The WebSocket itself is handled by textalk/websocket package.
  */
-class WebSocket extends AbstractConnection {
+class WebSocket extends AbstractConnection
+{
     protected $url, ///< Given URL
         $ws_client; ///< The WebSocket\Client instance
 
@@ -31,7 +33,7 @@ class WebSocket extends AbstractConnection {
      */
     public function __construct($url, $options = array())
     {
-        $this->url       = $url;
+        $this->url = $url;
 
         if (isset($options['timeout'])) $this->timeout = $options['timeout'];
         else $options['timeout'] = $this->timeout;
@@ -60,8 +62,8 @@ class WebSocket extends AbstractConnection {
      */
     public function send(Request $request)
     {
-        if (func_num_args() > 1)   $request = func_get_args();
-        if (is_array($request))    $request = new BatchRequest($request);
+        if (func_num_args() > 1) $request = func_get_args();
+        if (is_array($request)) $request = new BatchRequest($request);
 
         if (!($request instanceof Request)) {
             throw new Exception\Exception('Invalid data type to be sent to server');
@@ -79,6 +81,7 @@ class WebSocket extends AbstractConnection {
             );
         }
         $request->setResponse($response);
+        $request->interpret();
         return $request;
     }
 
