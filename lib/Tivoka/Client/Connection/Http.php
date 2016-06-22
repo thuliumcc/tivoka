@@ -174,7 +174,6 @@ class Http extends AbstractConnection
         }
 
         $headersArray = self::http_parse_headers($response_headers);
-        $this->validateConnectionIsOk($headersArray);
         $request->setResponse($response);
         $request->setHeaders($headersArray);
         $request->setRawHeaders($response_headers);
@@ -200,16 +199,5 @@ class Http extends AbstractConnection
             }
         };
         return $headers_array;
-    }
-
-    private function validateConnectionIsOk($headersArray)
-    {
-        if (isset($headersArray['http_status']['http_code'])) {
-            $httpCode = $headersArray['http_status']['http_code'];
-            if ($httpCode != 200) {
-                $httpStatus = $headersArray['http_status']['status_text'];
-                throw new Exception\ConnectionException("Connection to '{$this->target}' failed. Http code: '$httpCode', status: '$httpStatus'.");
-            }
-        }
     }
 }
