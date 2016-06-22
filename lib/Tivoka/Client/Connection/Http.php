@@ -169,16 +169,19 @@ class Http extends AbstractConnection
         } else {
             throw new Exception\ConnectionException('Install cURL extension or enable allow_url_fopen');
         }
+
         if ($response === FALSE) {
             throw new Exception\ConnectionException('Connection to "' . $this->target . '" failed');
         }
 
         $headersArray = self::http_parse_headers($response_headers);
-        $this->validateHttpResponseCode($headersArray, $request->getValidHttpCodes());
-
-        $request->setHeaders($headersArray);
         $request->setRawHeaders($response_headers);
+        $request->setHeaders($headersArray);
         $request->setResponse($response);
+
+        $this->validateHttpResponseCode($headersArray, $request->getValidHttpCodes());
+        
+        $request->interpret();
         return $request;
     }
 

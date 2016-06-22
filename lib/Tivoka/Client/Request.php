@@ -102,23 +102,31 @@ class Request
     }
 
     /**
-     * Interprets the response
+     * Save raw response to field
      *
      * @param string $response json data
+     *
+     * @return void
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * Interprets the response
      *
      * @return void
      * @throws Exception\ConnectionException
      * @throws Exception\SyntaxException
      */
-    public function setResponse($response)
+    public function interpret()
     {
-        $this->response = $response;
-
-        if (trim($response) == '') {
+        if (trim($this->response) == '') {
             throw new Exception\ConnectionException('No response received');
         }
 
-        $responseArray = json_decode($response, true);
+        $responseArray = json_decode($this->response, true);
         if ($responseArray == NULL) {
             throw new Exception\SyntaxException('Invalid response encoding');
         }
