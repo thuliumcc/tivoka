@@ -42,11 +42,17 @@ class Notification extends Request
      * @param mixed $params Additional params for the remote procedure
      * @see Tivoka_Connection::send()
      */
-    public function __construct($method, $params=null)
+    public function __construct($method, $params = null)
     {
         $this->id = null;
         $this->method = $method;
         $this->params = $params;
     }
+
+    public function getValidHttpCodes()
+    {
+        return [204, 200];
+    }
 }
+
 ?>

@@ -76,6 +76,11 @@ class Request
         $this->serializer = $serializer ?: new RequestJsonSerializerWithParams();
     }
 
+    public function getValidHttpCodes()
+    {
+        return [200];
+    }
+
     /**
      * Get the raw, JSON-encoded request
      * @param int $spec
