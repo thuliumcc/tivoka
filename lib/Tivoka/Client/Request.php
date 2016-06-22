@@ -97,24 +97,6 @@ class Request
     }
 
     /**
-     * Parses headers as returned by magic variable $http_response_header
-     * @param array $headers array of string coming from $http_response_header
-     * @return array associative array linking a header label with its value
-     */
-    protected static function http_parse_headers($headers)
-    {
-        // rfc2616: The first line of a Response message is the Status-Line
-        $headers = array_slice($headers, 1); // removing status-line
-
-        $headers_array = array();
-        foreach ($headers as $header) {
-            preg_match('/(?P<label>[^ :]+):(?P<body>(.|\r?\n(?= +))*)$/', $header, $matches);
-            $headers_array[$matches["label"]] = trim($matches["body"]);
-        };
-        return $headers_array;
-    }
-
-    /**
      * Interprets the response
      *
      * @param string $response json data
@@ -141,13 +123,22 @@ class Request
 
     /**
      * Save and parse the HTTP headers
+     * @param array $headersArray parsed headers, key => value
+     * @return void
+     */
+    public function setHeaders($headersArray)
+    {
+        $this->responseHeaders = $headersArray;
+    }
+
+    /**
+     * Save and parse the HTTP headers
      * @param array $raw_headers array of string coming from $http_response_header magic var
      * @return void
      */
-    public function setHeaders($raw_headers)
+    public function setRawHeaders($raw_headers)
     {
         $this->responseHeadersRaw = $raw_headers;
-        $this->responseHeaders = self::http_parse_headers($raw_headers);
     }
 
     /**

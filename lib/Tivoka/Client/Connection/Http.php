@@ -173,7 +173,31 @@ class Http extends AbstractConnection
             throw new Exception\ConnectionException('Connection to "' . $this->target . '" failed');
         }
         $request->setResponse($response);
-        $request->setHeaders($response_headers);
+        $request->setHeaders($this->parseHeaders($response_headers));
+        $request->setRawHeaders($response_headers);
         return $request;
+    }
+
+    private function parseHeaders($response_headers)
+    {
+        return $this->http_parse_headers($response_headers);
+    }
+
+    /**
+     * Parses headers as returned by magic variable $http_response_header
+     * @param array $headers array of string coming from $http_response_header
+     * @return array associative array linking a header label with its value
+     */
+    protected function http_parse_headers($headers)
+    {
+        // rfc2616: The first line of a Response message is the Status-Line
+        $headers = array_slice($headers, 1); // removing status-line
+
+        $headers_array = array();
+        foreach ($headers as $header) {
+            preg_match('/(?P<label>[^ :]+):(?P<body>(.|\r?\n(?= +))*)$/', $header, $matches);
+            $headers_array[$matches["label"]] = trim($matches["body"]);
+        };
+        return $headers_array;
     }
 }
